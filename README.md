@@ -6,129 +6,97 @@ A Baserow-based intern quiz submission pipeline integrated with **n8n** for auto
 
 ## 📌 Project Overview
 
-The **Intern Pipeline Planning** project is part of the intern onboarding and submission automation workflow.
+The **Intern Pipeline Planning** project focuses on building and validating the core intern quiz submission pipeline.
 
-The current implementation focuses on building and validating the core submission pipeline:
+The current implementation validates the complete data flow from Baserow to n8n and prepares the final Mattermost notification stage.
+
+### End-to-End Flow
 
 ```text
 Baserow Form
      ↓
 Baserow Table
      ↓
-n8n Webhook
+n8n Trigger
      ↓
 Field Mapping
      ↓
+Dhaka Time Conversion
+     ↓
 Mattermost Notification
 ```
-
-The goal is to ensure that quiz submission data can move reliably from Baserow into n8n, be processed and mapped correctly, and then be delivered to Mattermost.
 
 ---
 
 ## 🎯 Current Scope
 
-The current implementation covers:
+The current implementation focuses on the submission pipeline rather than creating departmental quiz questions.
 
-* Baserow quiz submission table
-* Baserow form
+### Implemented
+
+* Baserow Quiz Submissions table
+* Baserow submission form
+* Participant field
+* Quiz Name field
+* Score field
 * Automatic submission timestamp
-* Baserow → n8n webhook integration
+* Baserow → n8n integration
 * n8n field mapping
-* Timestamp conversion to Dhaka time
-* Mattermost notification preparation
+* Dhaka timezone conversion
+* Mattermost notification node preparation
 * End-to-end pipeline testing
-
-> **Note:** Quiz questions and departmental quiz creation are not part of the current implementation scope. The focus is on validating the submission pipeline.
 
 ---
 
 ## 🗂️ Baserow Setup
 
-A dedicated **Quiz Submissions** table was created in Baserow.
+A dedicated **Quiz Submissions** table was created in Baserow to receive quiz submission data.
 
-### Fields
+### Table Fields
 
-| Field        | Type      | Purpose                               |
-| ------------ | --------- | ------------------------------------- |
-| Participant  | Text      | Stores the participant name           |
-| Quiz Name    | Text      | Identifies the submitted quiz         |
-| Score        | Number    | Stores the quiz score                 |
-| Submitted At | Date/Time | Automatically records submission time |
+| Field        | Purpose                                        |
+| ------------ | ---------------------------------------------- |
+| Participant  | Stores the participant name                    |
+| Quiz Name    | Identifies the submitted quiz                  |
+| Score        | Stores the submitted score                     |
+| Submitted At | Automatically records the submission timestamp |
 
-No unnecessary fields were added to keep the pipeline simple and focused on the required submission data.
+The table is connected to the Baserow form so that every form submission creates a new row.
 
 ---
 
 ## 📝 Baserow Form
 
-The Baserow form is used as the submission interface.
+The Baserow form provides the submission interface for quiz data.
 
 ### Form Fields
 
-* Participant
-* Quiz Name
-* Score
-* Submitted At
+* **Participant**
+* **Quiz Name**
+* **Score**
+* **Submitted At**
 
-When a form is submitted, a new row is created in the Baserow table.
+### Baserow Pipeline
 
-### Form Screenshot
-
-![Baserow Quiz Submission Form](screenshots/baserow-form.png)
+![Baserow Pipeline](./screenshots/baserow-pipeline.png)
 
 ---
 
-## 🗃️ Baserow Table
+## ⚙️ n8n Automation
 
-The submitted form data is stored directly in the Baserow **Quiz Submissions** table.
+The Baserow table is connected to an n8n workflow.
 
-### Table Screenshot
+When a new row is created in Baserow, the n8n workflow receives the submission data and processes the required fields.
 
-![Baserow Quiz Submissions Table](screenshots/baserow-table.png)
+### n8n Pipeline
 
----
-
-## ⚙️ n8n Integration
-
-The Baserow table is connected to an n8n workflow using the **Baserow Rows Created** trigger.
-
-### Workflow
-
-```text
-Baserow
-   │
-   │ New Row Created
-   ▼
-n8n Webhook / Trigger
-   │
-   ▼
-Field Mapping
-   │
-   ▼
-Dhaka Time Conversion
-   │
-   ▼
-Mattermost Notification
-```
+![n8n Pipeline](./screenshots/n8n-pipeline.png)
 
 ---
 
-## 🔗 Webhook Integration
+## 🔄 Data Processing
 
-The n8n workflow receives newly created Baserow rows automatically.
-
-The webhook/trigger was tested using real Baserow form submissions, and the submitted data was successfully received by n8n.
-
-### n8n Webhook Screenshot
-
-![n8n Baserow Webhook](screenshots/n8n-webhook.png)
-
----
-
-## 🔄 Field Mapping
-
-The received Baserow data is mapped into the required fields:
+The following fields are received from Baserow and mapped inside n8n:
 
 ```text
 Participant
@@ -137,11 +105,43 @@ Score
 Submitted At
 ```
 
-The `Submitted At` timestamp is converted to **Dhaka time (UTC+6)** before further processing.
+The `Submitted At` timestamp is converted to **Dhaka Time (UTC+6)** before the notification stage.
 
-### Field Mapping Screenshot
+---
 
-![n8n Field Mapping](screenshots/n8n-field-mapping.png)
+## 🔗 Automation Flow
+
+```text
+┌─────────────────────────┐
+│      Baserow Form       │
+│                         │
+│ Participant             │
+│ Quiz Name               │
+│ Score                   │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│     Baserow Table       │
+│   Quiz Submissions      │
+└────────────┬────────────┘
+             │
+             │ Row Created
+             ▼
+┌─────────────────────────┐
+│          n8n            │
+│                         │
+│ Trigger                │
+│ Field Mapping          │
+│ Time Conversion        │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│       Mattermost        │
+│      Notification       │
+└─────────────────────────┘
+```
 
 ---
 
@@ -149,9 +149,9 @@ The `Submitted At` timestamp is converted to **Dhaka time (UTC+6)** before furth
 
 The final stage of the pipeline is the Mattermost notification.
 
-The workflow is prepared to send the processed quiz submission information to the configured Mattermost channel.
+The n8n workflow is prepared to send the processed quiz submission information to the approved Mattermost channel.
 
-Expected notification structure:
+Expected notification:
 
 ```text
 New Quiz Submission
@@ -162,15 +162,13 @@ Score: <score>
 Submitted At: <Dhaka time>
 ```
 
-### Mattermost Screenshot
-
-![Mattermost Notification](screenshots/mattermost-notification.png)
+The Mattermost execution is pending confirmation of the approved n8n credential and destination channel.
 
 ---
 
 ## 🧪 Testing
 
-The pipeline was tested using actual Baserow form submissions.
+The pipeline was tested using real Baserow form submissions.
 
 ### Validation Checklist
 
@@ -178,28 +176,30 @@ The pipeline was tested using actual Baserow form submissions.
 * [x] Baserow form created
 * [x] Form submission tested
 * [x] Baserow row creation verified
-* [x] n8n trigger connected
-* [x] Data received successfully in n8n
+* [x] n8n integration configured
+* [x] Baserow data received by n8n
 * [x] Field mapping configured
-* [x] Submitted timestamp converted to Dhaka time
+* [x] Dhaka timezone conversion configured
 * [x] Mattermost notification node prepared
-* [ ] Final Mattermost notification execution pending approved credential/channel confirmation
+* [ ] Final Mattermost notification execution
 
 ---
 
 ## 📸 Implementation Evidence
 
-### Baserow Setup
+### Baserow
 
-The Baserow quiz submission table and form were created and tested successfully.
+The Baserow form and submission pipeline setup:
 
-![Baserow Pipeline Setup](./screenshots/baserow-pipeline.png)
+![Baserow Pipeline Evidence](./screenshots/baserow-pipeline.png)
 
-### n8n Integration
+### n8n
 
-The Baserow submission data is successfully received and processed through the n8n workflow.
+The n8n automation and data processing setup:
 
-![n8n Pipeline](./screenshots/n8n-pipeline.png)
+![n8n Pipeline Evidence](./screenshots/n8n-pipeline.png)
+
+---
 
 ## 📁 Project Structure
 
@@ -207,18 +207,15 @@ The Baserow submission data is successfully received and processed through the n
 intern-pipeline-planning/
 │
 ├── screenshots/
-│   ├── baserow-form.png
-│   ├── baserow-table.png
-│   ├── n8n-webhook.png
-│   ├── n8n-field-mapping.png
-│   └── mattermost-notification.png
+│   ├── baserow-pipeline.png
+│   └── n8n-pipeline.png
 │
 └── README.md
 ```
 
 ---
 
-## 🔧 Technologies Used
+## 🛠️ Technologies Used
 
 | Technology | Purpose                                 |
 | ---------- | --------------------------------------- |
@@ -226,75 +223,36 @@ intern-pipeline-planning/
 | n8n        | Workflow automation and data processing |
 | Mattermost | Notification and communication          |
 | Git        | Version control                         |
-| GitHub     | Project documentation and evidence      |
+| GitHub     | Repository and project documentation    |
 
 ---
 
-## 🔐 Security & Credentials
+## 🔐 Security
 
-No credentials, tokens, passwords, or sensitive configuration values are stored in this repository.
+No passwords, API keys, access tokens, or other sensitive credentials are stored in this repository.
 
-Credentials are managed through the appropriate n8n credential system.
-
----
-
-## 🚀 End-to-End Flow
-
-```text
-┌──────────────────────┐
-│    Baserow Form      │
-│                      │
-│ Participant          │
-│ Quiz Name            │
-│ Score                │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│   Baserow Table      │
-│   Quiz Submissions   │
-└──────────┬───────────┘
-           │
-           │ Row Created
-           ▼
-┌──────────────────────┐
-│        n8n           │
-│                      │
-│ Trigger              │
-│ Field Mapping        │
-│ Time Conversion      │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│     Mattermost       │
-│    Notification      │
-└──────────────────────┘
-```
+Credentials are managed through the appropriate n8n credential configuration.
 
 ---
 
 ## 📊 Project Status
 
-| Component              | Status                                     |
-| ---------------------- | ------------------------------------------ |
-| Baserow Table          | ✅ Completed                                |
-| Baserow Form           | ✅ Completed                                |
-| Form Testing           | ✅ Completed                                |
-| n8n Integration        | ✅ Completed                                |
-| Field Mapping          | ✅ Completed                                |
-| Dhaka Time Conversion  | ✅ Completed                                |
-| Mattermost Node        | 🟡 Prepared                                |
-| Final E2E Notification | 🟡 Pending Credential/Channel Confirmation |
+| Component                     | Status                  |
+| ----------------------------- | ----------------------- |
+| Baserow Table                 | ✅ Completed             |
+| Baserow Form                  | ✅ Completed             |
+| Form Testing                  | ✅ Completed             |
+| Baserow → n8n Integration     | ✅ Completed             |
+| Field Mapping                 | ✅ Completed             |
+| Dhaka Time Conversion         | ✅ Completed             |
+| Mattermost Node               | 🟡 Prepared             |
+| Final Mattermost Notification | 🟡 Pending Confirmation |
 
 ---
 
-## 🔗 Project Resources
+## 🚀 Next Step
 
-* **GitHub Repository:** `intern-pipeline-planning`
-* **Baserow:** Intern Pipeline Planning / Quiz Submissions
-* **Automation:** n8n Intern Pipeline Planning workflow
-* **Notification:** Mattermost
+The next step is to confirm the approved Mattermost credential and destination channel, then execute the final notification step to complete the end-to-end demonstration.
 
 ---
 
@@ -303,13 +261,26 @@ Credentials are managed through the appropriate n8n credential system.
 **Tanjim Ahmed**
 
 DevOps Intern
-Linux | Docker | CI/CD | Git/GitHub | Jenkins | Kubernetes | AWS | Terraform | Cloud & Automation
+
+**Skills:** Linux • Docker • Git/GitHub • CI/CD • Jenkins • Kubernetes • AWS • Terraform • Cloud & Automation
 
 ---
 
 ## 📌 Project Status
 
-**Current Status:** Core Baserow → n8n submission pipeline implemented and tested.
+**Core submission pipeline implemented and tested.**
 
-The remaining step is to validate the final Mattermost notification using the approved credential and destination channel.
+The current workflow successfully demonstrates:
+
+```text
+Baserow
+   ↓
+n8n
+   ↓
+Data Processing
+   ↓
+Mattermost
+```
+
+The final Mattermost execution remains pending credential and channel confirmation.
 
