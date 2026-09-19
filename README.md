@@ -189,27 +189,17 @@ The pipeline was tested using actual Baserow form submissions.
 
 ## 📸 Implementation Evidence
 
-### 1. Baserow Form
+### Baserow Setup
 
-![Baserow Form](screenshots/baserow-form.png)
+The Baserow quiz submission table and form were created and tested successfully.
 
-### 2. Baserow Table
+![Baserow Pipeline Setup](./screenshots/baserow-pipeline.png)
 
-![Baserow Table](screenshots/baserow-table.png)
+### n8n Integration
 
-### 3. n8n Webhook
+The Baserow submission data is successfully received and processed through the n8n workflow.
 
-![n8n Webhook](screenshots/n8n-webhook.png)
-
-### 4. n8n Field Mapping
-
-![n8n Field Mapping](screenshots/n8n-field-mapping.png)
-
-### 5. Mattermost Notification
-
-![Mattermost Notification](screenshots/mattermost-notification.png)
-
----
+![n8n Pipeline](./screenshots/n8n-pipeline.png)
 
 ## 📁 Project Structure
 
