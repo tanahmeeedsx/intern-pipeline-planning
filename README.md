@@ -185,21 +185,6 @@ The pipeline was tested using real Baserow form submissions.
 
 ---
 
-## 📸 Implementation Evidence
-
-### Baserow
-
-The Baserow form and submission pipeline setup:
-
-![Baserow Pipeline Evidence](./screenshots/baserow-pipeline.png)
-
-### n8n
-
-The n8n automation and data processing setup:
-
-![n8n Pipeline Evidence](./screenshots/n8n-pipeline.png)
-
----
 
 ## 📁 Project Structure
 
