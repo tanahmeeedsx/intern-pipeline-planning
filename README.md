@@ -68,8 +68,8 @@ The Baserow form provides the submission interface for quiz data.
 - Score
 - Submitted At
 
-**Baserow Pipeline**
-![Baserow Pipeline](screenshots/baserow-pipeline.png)
+**Baserow Form**
+![Baserow Pipeline](screenshots/baserow-form.png)
 
 ## ⚙️ n8n Automation
 
@@ -165,10 +165,9 @@ The pipeline was tested using real Baserow form submissions, running live agains
 intern-pipeline-planning/
 │
 ├── screenshots/
-│   ├── baserow-pipeline.png
+│   ├── baserow-form.png
 │   ├── n8n-final-workflow.png
 │   ├── mattermost-notification.png
-│   └── playbook-status-update.png
 │
 └── README.md
 ```
