@@ -1,8 +1,33 @@
 # Intern Pipeline Planning — Accounting Quiz Automation
 
+![Status](https://img.shields.io/badge/status-production-brightgreen)
+![Automation](https://img.shields.io/badge/automation-n8n-orange)
+![Backend](https://img.shields.io/badge/backend-baserow-blue)
+![Notifications](https://img.shields.io/badge/notifications-mattermost-informational)
+
 A Baserow-based intern quiz submission pipeline integrated with n8n for automated scoring and Mattermost notifications, built for **Springer Capital's Accounts Quiz 3**.
 
 > Looking for the earlier generic proof-of-concept version (before per-question scoring existed)? See [demo-quiz/README.md](demo-quiz/README.md).
+
+## 📑 Table of Contents
+
+- [Project Overview](#-project-overview)
+- [Baserow Form](#-baserow-form)
+- [How It Works](#️-how-it-works)
+- [Scoring Logic](#-scoring-logic)
+- [Mattermost Notification](#-mattermost-notification)
+- [What's in accounting-quiz/](#-whats-in-accounting-quiz)
+- [Setup in n8n](#-setup-in-n8n)
+- [Known TODOs](#-known-todos)
+- [Screenshots](#-screenshots)
+- [Project Structure](#-project-structure)
+- [Technologies Used](#️-technologies-used)
+- [Security](#-security)
+- [Project Status](#-project-status)
+- [Next Step](#-next-step)
+- [Author](#-author)
+
+---
 
 ## 📌 Project Overview
 
@@ -87,20 +112,20 @@ Note: q21–q23 are open-ended and need manual review.
 
 ## 📸 Screenshots
 
-### 1. Quiz Form View
+### 1. Baserow Grid View
+Submitted responses stored in the Baserow table.
+
+![Baserow grid view](accounting-quiz/screenshots/00-baserow-grid-view.png)
+
+### 2. Quiz Form View
 The Baserow form as seen by the intern submitting the quiz.
 
 ![Quiz form view](accounting-quiz/screenshots/01-quiz-form-view.png)
 
-### 2. n8n Workflow Configuration
+### 3. n8n Workflow Configuration
 The Webhook → Code → Edit Fields → Post a message workflow inside n8n.
 
 ![n8n workflow config](accounting-quiz/screenshots/02-n8n-workflow-config.png)
-
-### 3. Baserow Grid View
-Submitted responses stored in the Baserow table.
-
-![Baserow grid view](accounting-quiz/screenshots/00-baserow-grid-view.png)
 
 ### 4. Mattermost Result
 The final scored notification posted to Mattermost.
@@ -148,15 +173,17 @@ No passwords, API keys, access tokens, or other sensitive credentials are stored
 
 | Component | Status |
 |---|---|
-| Answer key (q1–q19) | ✅ Completed |
-| Answer key (q20) | ⏳ Pending internal doc confirmation |
-| Manual review flow (q21–q23) | ✅ Flagged in output |
-| n8n workflow build | ✅ Completed |
-| Live production test | ✅ Completed |
+| Baserow Form | ✅ Completed |
+| Baserow Table (Accounts Quiz 3) | ✅ Completed |
+| Baserow → n8n Webhook Integration | ✅ Completed |
+| n8n Scoring Logic (Code Node) | ✅ Completed |
+| n8n Workflow (Edit Fields + Post Message) | ✅ Completed |
+| Mattermost Notification | ✅ Completed |
+| Live Production Test | ✅ Completed |
 
 ## 🔜 Next Step
 
-Confirm `q20`'s answer, then repeat the same pattern for each remaining department quiz.
+Repeat the same pipeline pattern for each remaining department quiz.
 
 ## 👨‍💻 Author
 
